@@ -1,5 +1,22 @@
+# Virtual environment
 .venv/
+
+# Python cache
 __pycache__/
-.ipynb_checkpoints/
-.vscode/
 *.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

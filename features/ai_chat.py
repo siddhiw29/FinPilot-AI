@@ -1,8 +1,8 @@
 import streamlit as st
-import ollama
+from google import genai
 
 
-def ask_local_ai(
+def ask_cloud_ai(
     question,
     income,
     expense,
@@ -23,8 +23,7 @@ def ask_local_ai(
     prompt = f"""
 You are FinPilot AI, a personal finance assistant.
 
-Answer the user's question using the financial information
-provided below.
+Analyze the user's financial information and answer their question.
 
 Financial information:
 
@@ -42,26 +41,25 @@ Amount spent in highest category:
 User Question:
 {question}
 
-Rules:
-- Give a direct answer to the user's question.
-- Use the financial data above.
+Instructions:
+- Answer the user's actual question.
+- Use the provided financial data.
 - Do not invent transactions or numbers.
-- Give practical suggestions when useful.
+- Give practical suggestions when appropriate.
 - Keep the answer concise and easy to understand.
 - Do not provide professional investment, tax, or legal advice.
 """
 
-    response = ollama.chat(
-        model="llama3.2",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
+    client = genai.Client(
+        api_key=st.secrets["GEMINI_API_KEY"]
     )
 
-    return response["message"]["content"]
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt
+    )
+
+    return response.text
 
 
 def show_ai_chat(
@@ -93,12 +91,12 @@ def show_ai_chat(
     if question:
 
         with st.spinner(
-            "FinPilot AI is thinking..."
+            "FinPilot AI is analyzing your finances..."
         ):
 
             try:
 
-                response = ask_local_ai(
+                response = ask_cloud_ai(
                     question,
                     income,
                     expense,
@@ -115,7 +113,7 @@ def show_ai_chat(
             except Exception as error:
 
                 st.error(
-                    "Could not connect to Llama 3.2."
+                    "Unable to connect to FinPilot AI."
                 )
 
                 st.code(str(error))

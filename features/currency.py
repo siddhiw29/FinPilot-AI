@@ -1,11 +1,6 @@
-import pandas as pd
+import requests
+import streamlit as st
 
-CURRENCY_RATES = {
-    "EUR": 1.0,
-    "INR": 90.0,
-    "USD": 1.17,
-    "GBP": 0.86,
-}
 
 CURRENCY_SYMBOLS = {
     "EUR": "€",
@@ -15,36 +10,53 @@ CURRENCY_SYMBOLS = {
 }
 
 
-def convert_amount(amount, from_currency, to_currency):
-    """
-    Convert an amount from the source currency to the selected currency.
-    """
+@st.cache_data(ttl=3600)
+def get_exchange_rate(base_currency, target_currency):
 
-    if from_currency == to_currency:
-        return amount
+    if base_currency == target_currency:
+        return 1.0
 
-    amount_in_eur = amount / CURRENCY_RATES[from_currency]
-
-    return amount_in_eur * CURRENCY_RATES[to_currency]
-
-
-def convert_dataframe(df, from_currency, to_currency):
-    """
-    Convert transaction amounts to the selected currency.
-    """
-
-    df = df.copy()
-
-    df["Amount (EUR)"] = df["Amount (EUR)"].apply(
-        lambda amount: convert_amount(
-            amount,
-            from_currency,
-            to_currency
-        )
+    url = (
+        f"https://api.frankfurter.app/latest"
+        f"?from={base_currency}"
+        f"&to={target_currency}"
     )
 
-    return df
+    response = requests.get(
+        url,
+        timeout=10
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    return data["rates"][target_currency]
 
 
 def get_currency_symbol(currency):
-    return CURRENCY_SYMBOLS.get(currency, currency)
+
+    return CURRENCY_SYMBOLS.get(
+        currency,
+        currency
+    )
+
+
+def convert_dataframe(
+    df,
+    base_currency,
+    target_currency
+):
+
+    converted_df = df.copy()
+
+    rate = get_exchange_rate(
+        base_currency,
+        target_currency
+    )
+
+    converted_df["Amount (EUR)"] = (
+        converted_df["Amount (EUR)"] * rate
+    )
+
+    return converted_df

@@ -10,6 +10,7 @@ from src.analyzer import (
 from features.currency import (
     convert_dataframe,
     get_currency_symbol,
+    get_exchange_rate,
 )
 from features.savings_goal import show_savings_goal
 from features.budget_planner import show_budget_planner
@@ -34,6 +35,19 @@ selected_currency = st.sidebar.selectbox(
 
 currency_symbol = get_currency_symbol(selected_currency)
 
+if selected_currency != "EUR":
+    try:
+        exchange_rate = get_exchange_rate(
+            "EUR",
+            selected_currency
+        )
+    except Exception:
+        exchange_rate = 1.0
+        st.sidebar.warning(
+            "Live exchange rate unavailable. Using EUR values."
+        )
+else:
+    exchange_rate = 1.0
 page = st.sidebar.radio(
     "Navigation",
     [
@@ -122,6 +136,8 @@ filtered_df = filtered_df[
 # Calculate Summary
 # -----------------------------
 income, expense, savings = calculate_summary(filtered_df)
+
+
 health_score = financial_health_score(
     income,
     expense,
@@ -129,12 +145,15 @@ health_score = financial_health_score(
 )
 
 category_spending = (
-    filtered_df[filtered_df["Expense/Income"] == "Expense"]
+    filtered_df[
+        filtered_df["Expense/Income"] == "Expense"
+    ]
     .groupby("Category")["Amount (EUR)"]
     .sum()
     .reset_index()
 )
 
+category_spending["Amount (EUR)"] *= exchange_rate
 # ====================================================
 # DASHBOARD PAGE
 # ====================================================

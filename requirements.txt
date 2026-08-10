@@ -2,4 +2,4 @@ pandas
 matplotlib
 jupyter
 ipykernel
-ollama
+google-genai

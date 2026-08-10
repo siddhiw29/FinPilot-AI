@@ -40,8 +40,8 @@ Managing personal finances can be challenging when dealing with large volumes of
 - Plotly
 
 ### AI
-- Ollama
-- Llama 2
+AI Assistant:
+- Google Gemini API
 
 ---
 

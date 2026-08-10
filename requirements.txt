@@ -3,3 +3,4 @@ matplotlib
 jupyter
 ipykernel
 google-genai
+supabase

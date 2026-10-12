@@ -110,18 +110,7 @@ Provides:
 
 ---
 
-## Future Enhancements
 
-- Budget Planner
-- Savings Goal Tracker
-- Expense Forecasting
-- PDF Report Generation
-- AI Chat Assistant
-- Spending Anomaly Detection
-- Multi-user Authentication
-- Cloud Deployment
-
----
 
 ## Author
 
